@@ -1,5 +1,5 @@
 # ChronosGrid.js
-**Current Version: v1.1.0**
+**Current Version: v1.2.3**
 
 **ChronosGrid.js** is a lightweight, responsive, and data-driven jQuery plugin designed to render precise time-based schedules. It eliminates the manual effort of calculating grid positions and column spans, allowing developers to focus on data rather than CSS Grid math.
 
@@ -9,13 +9,15 @@
 
 ## 🚀 Key Features
 
-* **Autonomous Initialization**: The plugin handles all HTML injection. Just provide an empty `div` and the plugin builds the toolbar, wrappers, and grid.
-* **Flexible Day Ranges**: Pass any array of days (e.g., `['Monday', 'Wednesday', 'Friday']`) to render specific days in any custom order. Default range is Sunday to Saturday.
-* **Dual-Zoom Logic**: Integrated support for toggling between **30-minute** and **15-minute** intervals.
-* **Time Format Toggle**: Support for both **12-hour (AM/PM)** and **24-hour** display formats.
-* **Persistent Dark Mode**: Features a built-in theme engine with Sun/Moon icons that saves user preferences to `sessionStorage`.
-* **Smart Spanning**: Automatically calculates grid columns based on start/end times (e.g., an 8:00-9:30 event spans 3 columns in 30-min mode).
-* **Consistent Color Coding**: Generates unique, high-contrast HSL colors for each class title automatically.
+* **Autonomous Injection**: The plugin handles all HTML construction. Simply provide an empty `div` and ChronosGrid builds the toolbar, scrollable wrappers, and the dynamic grid.
+* **Hierarchical Text Layout**: Support for `title` and `subtitle` fields within events. Titles are rendered bold and prominent, while subtitles are muted for secondary details (e.g., location, instructor, or notes).
+* **Modern Dual-Tone Aesthetics**: Occupied cells feature a "bright-edge" accent border coupled with a high-lightness body, providing a clean, modern "Calendar-app" look inspired by premium UI kits.
+* **Dynamic Time Formatting**: Integrated toggle in the toolbar allows users to switch between **12-hour (AM/PM)** and **24-hour** formats instantly.
+* **Restricted Dual-Zoom**: Built-in support for toggling between **30-minute** and **15-minute** intervals, allowing for high-precision schedule viewing without UI clutter.
+* **Customizable Day Ranges**: Define any set of days (e.g., Sunday–Thursday or specific weekdays) in any custom order. The grid adapts its rows based on your array input.
+* **Robust Persistent Dark Mode**: Features a dedicated theme engine with Sun (☀️) and Moon (🌙) icons. Theme preferences are saved to `sessionStorage` and synchronized across the entire page.
+* **Smart Spanning & Color Logic**: Automatically calculates `grid-column` spans based on time inputs and assigns unique, consistent HSL colors to events based on their title strings.
+* **Sticky UI Components**: Day labels are "sticky" on the left-hand side, ensuring users never lose context while scrolling horizontally through long timelines.
 
 ---
 
@@ -42,8 +44,13 @@ Simply provide an empty div with a unique ID.
 Data should be provided as an array of objects. Use 24-hour format strings (HH:mm) for times.
 ```js
 const myEvents = [
-    { day: 'Monday', start: '08:00', end: '09:30', title: 'Introduction to Computers' },
-    { day: 'Wednesday', start: '10:15', end: '12:00', title: 'Advanced Math' }
+    { 
+        day: 'Monday', 
+        start: '08:00', 
+        end: '09:30', 
+        title: 'Stock in warehouse', 
+        subtitle: 'Section A-12' // New: Optional subtitle field
+    }
 ];
 ```
 
@@ -79,15 +86,21 @@ The plugin is built to be easily themed. You can override the following key clas
 ---
 
 ## 📜 Version History
-[1.1.0] 2026-01-11
+#### [1.0.0] 2026-01-10
+* Initial release of ChronosGrid.js.
+* Core grid rendering engine with 5-minute precision support.
+* Session-stored Dark Mode toggle.
+
+### [1.1.0] 2026-01-11
 * **Added:** 12-hour (AM/PM) and 24-hour time format toggle.
 * **Fixed:** Centering issues for time headers and booked class text.
 * **Improved:** Logic for dynamic `min-width` to prevent header congestion.
 
-[1.1.0] 2026-01-10
-* Initial release of ChronosGrid.js.
-* Core grid rendering engine with 5-minute precision support.
-* Session-stored Dark Mode toggle.
+### [1.2.3] - 2026-01-12
+- **Added**: Support for hierarchical text with `title` and `subtitle` fields.
+- **Improved**: CSS typography for clear visual distinction between primary and secondary event info.
+- **Fixed**: Theme toggle logic to ensure global page synchronization and persistent sessionStorage behavior.
+- **Fixed**: Dark Mode visibility issues; occupied cells now use high-contrast text and muted background tones.
 
 ---
 

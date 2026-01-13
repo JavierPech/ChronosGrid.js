@@ -1,35 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChronosGrid.js Demo</title>
     <link rel="stylesheet" href="chronos-grid.css">
     <style>
-        body { padding: 20px; background-color: #f0f2f5; transition: background 0.3s; }
-        .theme-dark body { background-color: #121212; }
-        h1 { font-family: sans-serif; text-align: center; }
-        .theme-dark h1 { color: white; }
+        body {
+            padding: 20px;
+            background-color: #f0f2f5;
+            transition: background 0.3s;
+        }
+
+        .theme-dark body {
+            background-color: #121212;
+        }
+
+        h1 {
+            font-family: sans-serif;
+            text-align: center;
+        }
+
+        .theme-dark h1 {
+            color: white;
+        }
     </style>
 </head>
+
 <body>
 
     <h1>My Weekly Schedule</h1>
-    
+
     <div id="my-chronos-grid"></div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="chronos-grid.js"></script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Sample Data
             const scheduleData = [
                 { day: 'Monday', start: '08:00', end: '09:30', title: 'Data Structures' },
-                { day: 'Tuesday', start: '10:00', end: '11:30', title: 'Web Development' },
-                { day: 'Wednesday', start: '09:00', end: '12:00', title: 'Senior Project' },
-                { day: 'Thursday', start: '14:00', end: '15:30', title: 'UI/UX Design' },
-                { day: 'Friday', start: '08:00', end: '10:00', title: 'Algorithm Lab' }
+                { day: 'Tuesday', start: '10:00', end: '11:30', title: 'Web Development', subtitle: 'Javier Pech' },
+                { day: 'Wednesday', start: '09:00', end: '12:00', title: 'Senior Project', subtitle: 'Javier Pech' },
+                { day: 'Thursday', start: '14:00', end: '15:30', title: 'UI/UX Design', subtitle: 'Javier Pech' },
+                { day: 'Friday', start: '08:00', end: '10:00', title: 'Algorithm Lab', subtitle: 'Javier Pech' }
             ];
 
             // Initialize ChronosGrid.js
@@ -42,4 +58,5 @@
         });
     </script>
 </body>
+
 </html>
