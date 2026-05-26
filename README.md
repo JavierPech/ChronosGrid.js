@@ -1,7 +1,7 @@
 # ChronosGrid.js
-**Current Version: v1.2.3**
+**Current Version: v3.0.0 (PRO)**
 
-**ChronosGrid.js** is a lightweight, responsive, and data-driven jQuery plugin designed to render precise time-based schedules. It eliminates the manual effort of calculating grid positions and column spans, allowing developers to focus on data rather than CSS Grid math.
+**ChronosGrid.js** is a lightweight, responsive, and framework-agnostic **Vanilla JS** schedule engine designed to render precise time-based schedules. It eliminates the manual effort of calculating grid positions and column spans, allowing developers to focus on data rather than CSS Grid math.
 
 > **Plugin Developer**: Created by **Gemini**, an AI thought partner, in collaboration with a developer focused on clean, modular UI components.
 
@@ -9,24 +9,24 @@
 
 ## 🚀 Key Features
 
-* **Autonomous Injection**: The plugin handles all HTML construction. Simply provide an empty `div` and ChronosGrid builds the toolbar, scrollable wrappers, and the dynamic grid.
-* **Hierarchical Text Layout**: Support for `title` and `subtitle` fields within events. Titles are rendered bold and prominent, while subtitles are muted for secondary details (e.g., location, instructor, or notes).
-* **Modern Dual-Tone Aesthetics**: Occupied cells feature a "bright-edge" accent border coupled with a high-lightness body, providing a clean, modern "Calendar-app" look inspired by premium UI kits.
-* **Dynamic Time Formatting**: Integrated toggle in the toolbar allows users to switch between **12-hour (AM/PM)** and **24-hour** formats instantly.
-* **Restricted Dual-Zoom**: Built-in support for toggling between **30-minute** and **15-minute** intervals, allowing for high-precision schedule viewing without UI clutter.
-* **Customizable Day Ranges**: Define any set of days (e.g., Sunday–Thursday or specific weekdays) in any custom order. The grid adapts its rows based on your array input.
-* **Robust Persistent Dark Mode**: Features a dedicated theme engine with Sun (☀️) and Moon (🌙) icons. Theme preferences are saved to `sessionStorage` and synchronized across the entire page.
-* **Smart Spanning & Color Logic**: Automatically calculates `grid-column` spans based on time inputs and assigns unique, consistent HSL colors to events based on their title strings.
-* **Sticky UI Components**: Day labels are "sticky" on the left-hand side, ensuring users never lose context while scrolling horizontally through long timelines.
+* **Zero-Dependency Native Architecture**: Re-engineered into a modern Vanilla JS class, eliminating any mandatory jQuery dependency while reducing payload sizes and maximizing rendering speeds.
+* **Intelligent Collision & Overlap Spacing**: Built-in interval scheduling logic (`assignEventsToTracks`) automatically groups and stacks conflicting/overlapping day events into parallel stacked tracks within a clean row container.
+* **Dynamic Event Callbacks**: Standard options support custom trigger actions (`onEventClick` and `onEventHover`) for responsive dashboard workflows.
+* **Deep WAI-ARIA Accessibility (a11y)**: Fully semantic layout structure mapping custom roles (`role="grid"`, `role="row"`, `role="rowheader"`, `role="columnheader"`, `role="gridcell"`) with accessible `aria-label` screen speech synthesis on scheduled events.
+* **Interactive Keyboard Navigation**: Users can tab through calendar cards and activate click actions via **Enter** or **Space** keys, using elegant theme-integrated focus rings.
+* **State-of-the-Art CSS Variables**: Custom variable-driven stylesheets (`--cg-*`) for Light and Dark modes with smooth transition capabilities.
+* **Dynamic Manipulation APIs**: Add or remove scheduled items on the fly using built-in methods like `addEvent`, `removeEvent`, and `setData`.
+* **Segmented iOS-Style Zoom**: Integrated toolbar that groups zoom buttons (`15 Min` / `30 Min`) into a sleek segmented capsule button group.
+* **Backwards Compatibility**: Includes a built-in jQuery wrapper so legacy calls (`$(selector).schedule(...)`) continue to work seamlessly out-of-the-box.
 
 ---
 
 ## 🛠️ Quick Start
 
 ### 1. Include Dependencies
+Simply link the compiled stylesheet and the modern Vanilla JS script:
 ```html
 <link rel="stylesheet" href="chronos-grid.css">
-<script src="[https://code.jquery.com/jquery-3.6.0.min.js](https://code.jquery.com/jquery-3.6.0.min.js)"></script>
 <script src="chronos-grid.js"></script>
 ```
 
@@ -35,78 +35,140 @@
 ## 📖 Usage
 
 ### 1. The HTML Structure
-Simply provide an empty div with a unique ID.
+Simply provide an empty container element with a unique ID:
 ```html
 <div id="my-calendar"></div>
 ```
 
-### 2. The Data Methodology
-Data should be provided as an array of objects. Use 24-hour format strings (HH:mm) for times.
+### 2. The Data Structure
+Define schedule data as an array of objects. Use 24-hour format strings (HH:mm) for times.
 ```js
 const myEvents = [
     { 
         day: 'Monday', 
         start: '08:00', 
         end: '09:30', 
-        title: 'Stock in warehouse', 
-        subtitle: 'Section A-12' // New: Optional subtitle field
+        title: 'Weekly Standup', 
+        subtitle: 'Conference Room 4'
     }
 ];
 ```
 
-### 3. Initialization
+### 3. Native Vanilla JS Initialization (Recommended)
+Instantiate ChronosGrid using the modern native constructor:
+```js
+const grid = new ChronosGrid('#my-calendar', myEvents, {
+    zoom: true,
+    timeFormat: '12h',
+    startTime: 7,
+    endTime: 18,
+    days: ['Monday', 'Tuesday', 'Wednesday'],
+    onEventClick: (event, element) => {
+        console.log("Clicked:", event.title);
+    }
+});
+```
+
+### 4. Legacy jQuery Initialization (Compatibility Layer)
+If your project depends on jQuery, you can still initialize the scheduler using the legacy syntax:
 ```js
 $('#my-calendar').schedule(myEvents, {
     zoom: true,
-    timeFormat: '12h',       // Choose '12h' or '24h'
-    startTime: 6,
-    endTime: 18,
-    days: ['Monday', 'Tuesday', 'Wednesday']
+    startTime: 7,
+    endTime: 18
 });
+
+// Access the underlying native instance via jQuery data object:
+const gridInstance = $('#my-calendar').data('chronos-grid');
+gridInstance.addEvent(...);
 ```
+
 ---
+
 ## ⚙️ Configuration Options
+
 | Option | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `startTime` | Integer | `6` | The hour the grid begins (24h format). |
 | `endTime` | Integer | `18` | The hour the grid ends (24h format). |
-| `timeFormat` | String | '24h' | Display format: '12h' or '24h'.
-| `interval` | Integer | `30` | Default time-slot granularity in minutes.|
-| `zoom` | Boolean | `false` | If true, adds 15/30 min zoom buttons to the toolbar.
-| `days` | Array | `[Sun...Sat]` | Custom list of days to display. |
+| `timeFormat` | String | `'24h'` | Display format: `'12h'` or `'24h'`. |
+| `interval` | Integer | `30` | Default time-slot granularity in minutes. |
+| `zoom` | Boolean | `false` | If true, adds segmented 15/30 min zoom controls. |
+| `days` | Array | `[Sun...Sat]` | List of days to display. |
+| `theme` | String | `'light'` | Theme selector: `'light'` or `'dark'`. |
+| `onEventClick` | Function | `null` | Callback function triggered when a card is clicked/selected. `(eventData, element) => {}` |
+| `onEventHover` | Function | `null` | Callback function triggered when cursor enters or leaves a card. `(eventData, element, isEntering) => {}` |
+
+---
+
+## 🎛️ Public API Actions
+
+Manipulate the calendar dynamically using the native object methods:
+
+### 1. `addEvent(eventData)`
+Dynamically inserts an event, instantly recalculating tracks and rendering the grid.
+```js
+grid.addEvent({
+    day: 'Monday',
+    start: '10:00',
+    end: '11:00',
+    title: 'Code Review',
+    subtitle: 'GitHub Pull Requests'
+});
+```
+
+### 2. `removeEvent(eventTitle)`
+Deletes events matching the title parameter and compiles the grid.
+```js
+grid.removeEvent('Code Review');
+```
+
+### 3. `setData(newData)`
+Replaces the active dataset and re-renders the schedule.
+```js
+grid.setData([
+    { day: 'Friday', start: '13:00', end: '14:00', title: 'Tech Talk' }
+]);
+```
+
 ---
 
 ## 🎨 CSS Customization
-The plugin is built to be easily themed. You can override the following key classes:
-* `.slot.booked`: Styles the colored event blocks.
-* `.day-label`: Styles the sticky day column.
-* `.theme-dark`: The root class used to apply Dark Mode variables.
-* `.time-header`: Styles the top timeline labels.
+
+The plugin is fully customizable using modern HSL-driven CSS custom variables. Override these variables inside your app stylesheets to adjust colors:
+* `--cg-bg-canvas`: The main card and grid background fill.
+* `--cg-border-subtle`: Separator lines dividing the time blocks.
+* `--cg-border-medium`: Divider border on the sticky day column.
+* `--cg-btn-active-bg`: Color of toggled active control segments.
 
 ---
 
 ## 📜 Version History
-#### [1.0.0] 2026-01-10
+
+#### [3.0.0] - 2026-05-26
+* **Refactored**: Rewrote engine from jQuery to standard ES6 Vanilla JS Class API.
+* **Added**: High-performance **Interval Scheduling overlap tracks** for collision-free schedules.
+* **Added**: Native click/hover action callbacks (`onEventClick` and `onEventHover`).
+* **Added**: WAI-ARIA role structures, keyboard grid tab navigation, and responsive outline focus rings.
+* **Added**: Direct state manipulation APIs (`addEvent`, `removeEvent`, `setData`).
+* **Improved**: Replaced raw buttons with segmented iOS-style zoom capsule sliders.
+* **Improved**: Removed Sun/Moon emojis from theme toggle button for clean flat text styling.
+* **Fixed**: Horizontal alignment bugs on multi-row wraps by nesting grid rows natively.
+
+#### [1.2.3] - 2026-01-12
+* **Added**: Support for hierarchical text with `title` and `subtitle` fields.
+* **Fixed**: Theme toggle persistent session sync.
+
+#### [1.1.0] - 2026-01-11
+* **Added**: 12-hour / 24-hour formatting toggle.
+
+#### [1.0.0] - 2026-01-10
 * Initial release of ChronosGrid.js.
-* Core grid rendering engine with 5-minute precision support.
-* Session-stored Dark Mode toggle.
-
-### [1.1.0] 2026-01-11
-* **Added:** 12-hour (AM/PM) and 24-hour time format toggle.
-* **Fixed:** Centering issues for time headers and booked class text.
-* **Improved:** Logic for dynamic `min-width` to prevent header congestion.
-
-### [1.2.3] - 2026-01-12
-- **Added**: Support for hierarchical text with `title` and `subtitle` fields.
-- **Improved**: CSS typography for clear visual distinction between primary and secondary event info.
-- **Fixed**: Theme toggle logic to ensure global page synchronization and persistent sessionStorage behavior.
-- **Fixed**: Dark Mode visibility issues; occupied cells now use high-contrast text and muted background tones.
 
 ---
 
 ## 📄 License
+
 Distributed under the MIT License. This means you are free to use, modify, and distribute this software, provided the original authorship credit remains intact.
 
 Created with ❤️ by Gemini.
-
----

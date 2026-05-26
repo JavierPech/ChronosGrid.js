@@ -1,164 +1,340 @@
-/* ChronosGrid.js v1.2.3 - Core Styles */
+/* ChronosGrid.js v3.0.0 - Core Premium Stylesheet */
 
+:root {
+    --cg-font: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    
+    /* Premium Modern Light Theme */
+    --cg-bg-canvas: #ffffff;
+    --cg-border-subtle: #f1f5f9;      /* Slate-100: Soft lines for cell dividers */
+    --cg-border-medium: #e2e8f0;      /* Slate-200: Elegant boundary for sticky columns */
+    --cg-text-primary: #0f172a;       /* Slate-900: Titles and strong headers */
+    --cg-text-secondary: #64748b;     /* Slate-500: Subtitles and labels */
+    
+    /* Control Toolbar */
+    --cg-toolbar-bg: #f8fafc;         /* Elegant slate background tint */
+    --cg-toolbar-border: #e2e8f0;
+    
+    /* Standard Buttons */
+    --cg-btn-bg: #ffffff;
+    --cg-btn-border: #e2e8f0;
+    --cg-btn-text: #475569;
+    --cg-btn-hover-bg: #f8fafc;
+    --cg-btn-hover-border: #cbd5e1;
+    --cg-btn-active-bg: #0f172a;
+    --cg-btn-active-text: #ffffff;
+    --cg-btn-active-border: #0f172a;
+    
+    /* Grid Cells */
+    --cg-time-header-bg: #f8fafc;
+    --cg-time-header-text: #475569;
+    --cg-day-label-bg: #ffffff;
+    --cg-day-label-text: #0f172a;
+    
+    /* Shadows */
+    --cg-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+    --cg-shadow-md: 0 4px 10px -2px rgba(15, 23, 42, 0.05), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
+}
+
+.theme-dark {
+    /* Rich Premium Dark Theme */
+    --cg-bg-canvas: #0c0d12;
+    --cg-border-subtle: #1e293b;      /* Slate-800: Soft dark lines */
+    --cg-border-medium: #334155;      /* Slate-700: Stronger sticky border */
+    --cg-text-primary: #f8fafc;
+    --cg-text-secondary: #94a3b8;
+    
+    /* Control Toolbar */
+    --cg-toolbar-bg: #131520;
+    --cg-toolbar-border: #1e293b;
+    
+    /* Standard Buttons */
+    --cg-btn-bg: #1c1e2d;
+    --cg-btn-border: #334155;
+    --cg-btn-text: #cbd5e1;
+    --cg-btn-hover-bg: #272a3e;
+    --cg-btn-hover-border: #475569;
+    --cg-btn-active-bg: #3b82f6;      /* Royal blue active toggle in dark */
+    --cg-btn-active-text: #ffffff;
+    --cg-btn-active-border: #3b82f6;
+    
+    /* Grid Cells */
+    --cg-time-header-bg: #131520;
+    --cg-time-header-text: #94a3b8;
+    --cg-day-label-bg: #0c0d12;
+    --cg-day-label-text: #f8fafc;
+}
+
+/* Core Container */
 .schedule-container-main {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    gap: 16px;
+    font-family: var(--cg-font);
+    transition: background 0.3s, border-color 0.3s;
 }
 
+/* Segmented & Glassmorphic Toolbar */
 .schedule-controls {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #f4f4f4;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
+    background: var(--cg-toolbar-bg);
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--cg-toolbar-border);
+    transition: all 0.3s ease;
+    flex-wrap: wrap;
 }
 
+.schedule-controls > span {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--cg-text-secondary);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Custom Segmented iOS-Style Zoom Control Capsule */
+.zoom-group {
+    display: flex;
+    gap: 2px !important;
+    background: var(--cg-toolbar-border);
+    padding: 3px !important;
+    border-radius: 8px;
+    align-items: center;
+    border: 1px solid var(--cg-toolbar-border);
+}
+
+.zoom-group .schedule-btn {
+    border: none !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    padding: 5px 12px !important;
+    font-size: 12px !important;
+    box-shadow: none !important;
+    color: var(--cg-text-secondary) !important;
+    font-weight: 600;
+}
+
+.zoom-group .schedule-btn:hover {
+    background: rgba(0, 0, 0, 0.04) !important;
+}
+
+.theme-dark .zoom-group .schedule-btn:hover {
+    background: rgba(255, 255, 255, 0.04) !important;
+}
+
+.zoom-group .schedule-btn.active {
+    background: var(--cg-btn-bg) !important;
+    color: var(--cg-text-primary) !important;
+    box-shadow: var(--cg-shadow-sm) !important;
+}
+
+/* Standard Toolbar Buttons */
 .schedule-btn {
-    padding: 6px 12px;
-    border: 1px solid #ccc;
-    background: white;
+    padding: 7px 14px;
+    border: 1px solid var(--cg-btn-border);
+    background: var(--cg-btn-bg);
+    color: var(--cg-btn-text);
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 13px;
+    font-weight: 600;
+    font-family: var(--cg-font);
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.schedule-btn:hover {
+    background: var(--cg-btn-hover-bg);
+    border-color: var(--cg-btn-hover-border);
 }
 
 .schedule-btn.active {
-    background: #2c3e50;
-    color: white;
-    border-color: #2c3e50;
+    background: var(--cg-btn-active-bg);
+    color: var(--cg-btn-active-text);
+    border-color: var(--cg-btn-active-border);
 }
 
+.theme-toggle-btn {
+    margin-left: auto;
+}
+
+/* Scrollable Wrapper with Custom Sleek Scrollbar */
 .calendar-wrapper {
     width: 100%;
     overflow-x: auto;
-    border: 1px solid #bbb;
-    border-radius: 8px;
-    background: #fff;
+    border: 1px solid var(--cg-toolbar-border);
+    border-radius: 12px;
+    background: var(--cg-bg-canvas);
+    box-shadow: var(--cg-shadow-sm);
+    transition: all 0.3s ease;
 }
 
+.calendar-wrapper::-webkit-scrollbar {
+    height: 6px;
+}
+
+.calendar-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.calendar-wrapper::-webkit-scrollbar-thumb {
+    background: var(--cg-border-medium);
+    border-radius: 10px;
+}
+
+.calendar-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--cg-text-secondary);
+}
+
+/* Row-Based Nesting CSS Grid Layout (Eliminates border bugs entirely) */
 .schedule-grid {
     display: grid;
+    grid-template-columns: 1fr;
+    gap: 1px;
+    background: var(--cg-border-subtle); /* Horizontal line separating rows/days */
 }
 
+.schedule-header-row,
+.schedule-day-row {
+    background: var(--cg-border-subtle); /* Vertical lines separating grid columns */
+}
+
+/* Grid Cell Structures */
 .day-label,
 .time-header,
 .slot {
-    border-top: 1px solid #ddd;
-    border-left: 1px solid #ddd;
     box-sizing: border-box;
     min-height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background 0.2s ease;
 }
 
 .time-header {
-    background: #2c3e50;
-    color: white;
-    font-size: 0.75rem;
+    background: var(--cg-time-header-bg);
+    color: var(--cg-time-header-text);
+    font-size: 11px;
     font-weight: 600;
     min-height: auto;
-    padding: 12px 5px;
+    padding: 12px 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
+/* Sticky Day Label stretching cleanly across tracks */
 .day-label {
     position: sticky;
     left: 0;
-    background: #f8f9fa;
-    font-weight: bold;
+    background: var(--cg-day-label-bg);
+    color: var(--cg-day-label-text);
+    font-weight: 700;
+    font-size: 13px;
     z-index: 10;
-    padding: 0 15px;
+    padding: 0 16px;
     white-space: nowrap;
-    border-right: 2px solid #bbb;
+    border-right: 1px solid var(--cg-border-medium);
     justify-content: flex-start;
+    box-shadow: 4px 0 10px -5px rgba(0, 0, 0, 0.03);
 }
 
-/* --- DUAL-TONE OCCUPIED CELL DESIGN --- */
+.theme-dark .day-label {
+    box-shadow: 4px 0 12px -5px rgba(0, 0, 0, 0.25);
+}
+
+/* Empty slots basic styling */
+.slot.empty {
+    background: var(--cg-bg-canvas);
+}
+
+.slot.empty:hover {
+    background: var(--cg-toolbar-bg);
+}
+
+/* --- STATE-OF-THE-ART INTERACTIVE EVENT CARDS --- */
 .slot.booked {
     padding: 0;
-    /* Container padding handled by text-container */
     z-index: 5;
     border-radius: 8px;
-    margin: 4px;
-    border: none;
-    border-left: 5px solid var(--accent-color);
+    margin: 5px;
+    border: 1px solid transparent;
+    border-left: 4px solid var(--accent-color) !important;
     background-color: var(--bg-color-light);
     justify-content: flex-start;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--cg-shadow-sm);
     overflow: hidden;
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+                box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.2s ease;
 }
 
+/* Interactive focus feedback for accessibility */
+.slot.booked:focus-visible {
+    outline: 2px solid var(--accent-color) !important;
+    outline-offset: -3px !important;
+    box-shadow: var(--cg-shadow-md), 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+}
+
+/* Card interior layouts */
 .slot-text-container {
     padding: 8px 12px;
     display: flex;
     flex-direction: column;
     gap: 2px;
     width: 100%;
+    overflow: hidden;
 }
 
 .slot-title {
-    color: #000;
-    font-size: 0.9rem;
+    color: var(--bg-color-dark); /* Perfectly matched deep low-lightness color */
+    font-size: 13px;
     font-weight: 700;
-}
-
-.slot-subtitle {
-    color: #555;
-    /* Muted tone for subtitle */
-    font-size: 0.75rem;
-    font-weight: 400;
-}
-
-/* --- DARK MODE THEMING --- */
-.theme-dark .schedule-controls {
-    background: #333;
-    border-color: #444;
-    color: #eee;
-}
-
-.theme-dark .schedule-btn {
-    background: #444;
-    color: #eee;
-    border-color: #555;
-}
-
-.theme-dark .calendar-wrapper {
-    background: #222;
-    border-color: #444;
-}
-
-.theme-dark .day-label {
-    background: #2a2a2a;
-    color: #fff;
-    border-right-color: #555;
-}
-
-.theme-dark .slot {
-    background: #222;
-    border-color: #444;
-}
-
-.theme-dark .time-header {
-    background: #1a1a1a;
-}
-
-.theme-dark .slot.booked {
-    background-color: var(--bg-color-dark);
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .theme-dark .slot-title {
-    color: #fff;
-    /* White title for contrast */
+    color: var(--bg-color-light); /* Luminous light-tint HSL in dark mode */
+}
+
+.slot-subtitle {
+    color: var(--accent-color);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .theme-dark .slot-subtitle {
-    color: #bbb;
-    /* Lighter muted grey for dark mode subtitle */
+    color: var(--bg-color-light);
+    opacity: 0.8;
+}
+
+/* Hover effects: 3D Lift & Shadow Glow */
+.slot.booked:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: var(--cg-shadow-md), 0 0 12px -2px var(--accent-color);
+    filter: brightness(1.02);
+}
+
+.theme-dark .slot.booked {
+    background-color: rgba(22, 24, 35, 0.55);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)), 
+                      linear-gradient(var(--bg-color-dark), var(--bg-color-dark));
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.theme-dark .slot.booked:hover {
+    filter: brightness(1.15);
+    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.5), 0 0 14px -2px var(--accent-color);
 }
