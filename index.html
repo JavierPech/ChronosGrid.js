@@ -5,21 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChronosGrid.js - Interactive Schedule Engine</title>
-    
+
     <!-- Google Fonts: Plus Jakarta Sans for premium typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- ChronosGrid CSS -->
     <link rel="stylesheet" href="chronos-grid.css">
-    
+
     <style>
         /* Demo Page Styling - Premium SaaS Dashboard */
         :root {
-            --db-bg: radial-gradient(circle at 10% 20%, rgba(242, 246, 253, 0.4) 0%, rgba(242, 246, 253, 0) 90%), 
-                      radial-gradient(circle at 90% 80%, rgba(235, 237, 255, 0.4) 0%, rgba(235, 237, 255, 0) 90%), 
-                      #fafafc;
+            --db-bg: radial-gradient(circle at 10% 20%, rgba(242, 246, 253, 0.4) 0%, rgba(242, 246, 253, 0) 90%),
+                radial-gradient(circle at 90% 80%, rgba(235, 237, 255, 0.4) 0%, rgba(235, 237, 255, 0) 90%),
+                #fafafc;
             --db-card-bg: rgba(255, 255, 255, 0.7);
             --db-border: rgba(226, 232, 240, 0.8);
             --db-text-primary: #0f172a;
@@ -30,9 +31,9 @@
         }
 
         .theme-dark {
-            --db-bg: radial-gradient(circle at 10% 20%, rgba(29, 38, 57, 0.6) 0%, rgba(29, 38, 57, 0) 90%), 
-                      radial-gradient(circle at 90% 80%, rgba(20, 24, 45, 0.6) 0%, rgba(20, 24, 45, 0) 90%), 
-                      #08090d;
+            --db-bg: radial-gradient(circle at 10% 20%, rgba(29, 38, 57, 0.6) 0%, rgba(29, 38, 57, 0) 90%),
+                radial-gradient(circle at 90% 80%, rgba(20, 24, 45, 0.6) 0%, rgba(20, 24, 45, 0) 90%),
+                #08090d;
             --db-card-bg: rgba(17, 18, 25, 0.75);
             --db-border: rgba(38, 41, 56, 0.6);
             --db-text-primary: #f8fafc;
@@ -100,8 +101,17 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.1); opacity: 1; }
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
         }
 
         .logo-details h1 {
@@ -245,9 +255,21 @@
                     <p>Framework-Agnostic Vanilla JS Collision-Free Scheduler Component</p>
                 </div>
             </div>
-            
-            <div class="actions-panel">
+
+            <div class="actions-panel" style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <button class="action-btn" id="add-lunch-btn">⚡ Add Lunch Break</button>
+                <button class="action-btn" id="toggle-toolbar-btn"
+                    style="background: var(--db-card-bg); color: var(--db-text-primary); border: 1px solid var(--db-border); box-shadow: none;">👁️
+                    Toggle Toolbar</button>
+                <button class="action-btn" id="range-8-16-btn"
+                    style="background: var(--db-card-bg); color: var(--db-text-primary); border: 1px solid var(--db-border); box-shadow: none;">⏰
+                    Hour Range (8-16)</button>
+                <button class="action-btn" id="range-7-18-btn"
+                    style="background: var(--db-card-bg); color: var(--db-text-primary); border: 1px solid var(--db-border); box-shadow: none;">⏰
+                    Reset Range (7-18)</button>
+                <button class="action-btn" id="global-theme-btn"
+                    style="background: var(--db-card-bg); color: var(--db-text-primary); border: 1px solid var(--db-border); box-shadow: none;">🌓
+                    Sync Global Dark</button>
             </div>
         </header>
 
@@ -265,7 +287,8 @@
 
         <!-- Footer -->
         <footer class="dashboard-footer">
-            <p>ChronosGrid.js &bull; Modernized into an elegant, high-performance vanilla calendar engine with zero-dependencies.</p>
+            <p>ChronosGrid.js &bull; Modernized into an elegant, high-performance vanilla calendar engine with
+                zero-dependencies.</p>
         </footer>
     </div>
 
@@ -279,16 +302,19 @@
                 // Day Overlap 1: Monday morning overlaps
                 { day: 'Monday', start: '08:00', end: '09:30', title: 'Data Structures', subtitle: 'Lab 4 - Prof. Pech' },
                 { day: 'Monday', start: '09:00', end: '10:30', title: 'Code Review Standup', subtitle: 'Room 3 - Engineering Team' },
-                
-                // Tuesday event
+
+                // Tuesday events: Testing exact sub-interval alignment and overlap track wrapping
                 { day: 'Tuesday', start: '10:00', end: '11:30', title: 'Web Development', subtitle: 'Room 302 - Javier Pech' },
-                
+                { day: 'Tuesday', start: '13:45', end: '14:45', title: 'Compiler Design', subtitle: 'Room 101 - Javier Pech', color: '#2596be' },
+                { day: 'Tuesday', start: '14:30', end: '15:15', title: 'Ad-hoc Consultation', subtitle: 'Office 4' },
+
                 // Day Overlap 2: Wednesday overlapping blocks
-                { day: 'Wednesday', start: '09:00', end: '12:00', title: 'Senior Project Presentation', subtitle: 'Auditorium - Javier' },
+                { day: 'Wednesday', start: '09:00', end: '12:00', title: 'Senior Project Presentation', subtitle: 'Auditorium - Javier', color: '#555555' },
                 { day: 'Wednesday', start: '10:30', end: '11:30', title: 'Jury QA Review', subtitle: 'Auditorium Committee' },
-                
+                { day: 'Wednesday', start: '14:00', end: '13:00', title: 'Data Structures (Invalid)', subtitle: 'Invalid Timeframe Demo' },
+
                 // Thursday & Friday events
-                { day: 'Thursday', start: '14:00', end: '15:30', title: 'UI/UX Design', subtitle: 'Design Studio - Javier Pech' },
+                { day: 'Thursday', start: '14:00', end: '15:30', title: 'UI/UX Design', subtitle: 'Design Studio - Javier Pech', color: '#d946ef' },
                 { day: 'Friday', start: '08:00', end: '10:00', title: 'Algorithm Lab', subtitle: 'Lab 1 - Javier Pech' }
             ];
 
@@ -300,18 +326,22 @@
                 zoom: true,
                 startTime: 7,
                 endTime: 18,
+                clashes: false,
                 days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-                
+
                 // Premium Event click callback hook
                 onEventClick: (event, el) => {
+                    feedbackBanner.style.background = 'rgba(59, 130, 246, 0.08)';
+                    feedbackBanner.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+                    feedbackBanner.style.color = 'var(--db-accent)';
                     feedbackText.innerHTML = `<strong>Callback Triggered!</strong> You clicked: <em>"${event.title}"</em> on ${event.day} from ${event.start} to ${event.end}.`;
                     feedbackBanner.classList.add('show');
-                    
+
                     // Flash element green border briefly for visual feedback
                     el.style.transform = 'scale(0.98)';
                     setTimeout(() => el.style.transform = '', 150);
                 },
-                
+
                 // Premium Event hover callback hook
                 onEventHover: (event, el, isEntering) => {
                     if (isEntering) {
@@ -319,6 +349,30 @@
                     } else {
                         el.style.opacity = '1';
                     }
+                },
+
+                // Premium Empty slot click callback hook
+                onSlotClick: (day, time, el) => {
+                    feedbackBanner.style.background = 'rgba(59, 130, 246, 0.08)';
+                    feedbackBanner.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+                    feedbackBanner.style.color = 'var(--db-accent)';
+                    feedbackText.innerHTML = `<strong>Slot Callback Triggered!</strong> Empty slot clicked on <strong>${day}</strong> at <strong>${time}</strong>.`;
+                    feedbackBanner.classList.add('show');
+
+                    // Ripple/pulsate empty cell momentarily for beautiful user feedback
+                    el.style.backgroundColor = 'rgba(59, 130, 246, 0.15)';
+                    setTimeout(() => {
+                        el.style.backgroundColor = '';
+                    }, 400);
+                },
+
+                // Premium validation error hook (Notice to end user/lecturer)
+                onValidationError: (error, event) => {
+                    feedbackText.innerHTML = `⚠️ <strong>Lecturer Notice:</strong> The course <strong>"${event.title}"</strong> has invalid timeframes (<em>${event.start} to ${event.end}</em>) on <strong>${event.day}</strong>. Please check it out.`;
+                    feedbackBanner.style.background = 'rgba(239, 68, 68, 0.08)';
+                    feedbackBanner.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                    feedbackBanner.style.color = '#ef4444';
+                    feedbackBanner.classList.add('show');
                 }
             });
 
@@ -331,14 +385,52 @@
                     title: '🍱 Lunch Break',
                     subtitle: 'Campus Cafeteria'
                 });
-                
+
                 feedbackText.innerHTML = `<strong>Native API Triggered!</strong> Successfully added event: <em>"🍱 Lunch Break"</em> on Thursday (12:00 - 13:00) dynamically.`;
                 feedbackBanner.classList.add('show');
-                
+
                 // Disable button so they only add it once in the demo
                 document.getElementById('add-lunch-btn').disabled = true;
                 document.getElementById('add-lunch-btn').style.opacity = '0.5';
                 document.getElementById('add-lunch-btn').style.cursor = 'not-allowed';
+            });
+
+            // Toggle controls (Toolbar) visibility
+            let toolbarVisible = true;
+            document.getElementById('toggle-toolbar-btn').addEventListener('click', () => {
+                toolbarVisible = !toolbarVisible;
+                grid.toggleControls(toolbarVisible);
+
+                feedbackText.innerHTML = `<strong>API Triggered: toggleControls()</strong> Toolbar visibility toggled to: <em>${toolbarVisible}</em>.`;
+                feedbackBanner.classList.add('show');
+            });
+
+            // Adjust Hour Range to 8:00 - 16:00
+            document.getElementById('range-8-16-btn').addEventListener('click', () => {
+                grid.setHourRange(8, 16);
+                feedbackText.innerHTML = `<strong>API Triggered: setHourRange()</strong> Active columns adjusted to: <em>8:00 AM - 4:00 PM</em>.`;
+                feedbackBanner.classList.add('show');
+            });
+
+            // Reset Hour Range to 7:00 - 18:00
+            document.getElementById('range-7-18-btn').addEventListener('click', () => {
+                grid.setHourRange(7, 18);
+                feedbackText.innerHTML = `<strong>API Triggered: setHourRange()</strong> Active columns reset to: <em>7:00 AM - 6:00 PM</em>.`;
+                feedbackBanner.classList.add('show');
+            });
+
+            // Global Theme Sync toggle
+            let globalTheme = 'light';
+            document.getElementById('global-theme-btn').addEventListener('click', () => {
+                globalTheme = (globalTheme === 'light') ? 'dark' : 'light';
+                grid.setTheme(globalTheme);
+
+                // Keep the demo page's theme itself in sync!
+                document.body.classList.toggle('theme-dark', globalTheme === 'dark');
+
+                document.getElementById('global-theme-btn').textContent = `🌓 Sync Global ${globalTheme === 'light' ? 'Dark' : 'Light'}`;
+                feedbackText.innerHTML = `<strong>API Triggered: setTheme()</strong> Theme synced globally to: <em>${globalTheme.toUpperCase()} mode</em> (sessionStorage bypassed).`;
+                feedbackBanner.classList.add('show');
             });
         });
     </script>

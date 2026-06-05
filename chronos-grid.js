@@ -17,11 +17,15 @@ class ChronosGrid {
             endTime: 18,
             interval: 30,
             zoom: true,
+            showControls: true,
+            clashes: true,
             timeFormat: '24h',
             days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
             theme: sessionStorage.getItem('schedule-theme') || 'light',
             onEventClick: null,
-            onEventHover: null
+            onEventHover: null,
+            onSlotClick: null,
+            onValidationError: null
         }, options);
 
         this.currentFormat = this.options.timeFormat;
@@ -53,11 +57,13 @@ class ChronosGrid {
         this.renderGrid(this.currentInterval);
     }
 
-    applyTheme(theme) {
+    applyTheme(theme, saveToStorage = true) {
         const isDark = theme === 'dark';
         this.container.classList.toggle('theme-dark', isDark);
         document.body.classList.toggle('theme-dark', isDark);
-        sessionStorage.setItem('schedule-theme', theme);
+        if (saveToStorage) {
+            sessionStorage.setItem('schedule-theme', theme);
+        }
         
         const toggleBtn = this.container.querySelector('.theme-toggle-btn span');
         if (toggleBtn) {
@@ -70,6 +76,10 @@ class ChronosGrid {
         this.toolbar.className = 'schedule-controls';
         this.toolbar.setAttribute('role', 'toolbar');
         this.toolbar.setAttribute('aria-label', 'Schedule Controls');
+        
+        if (!this.options.showControls) {
+            this.toolbar.style.display = 'none';
+        }
 
         if (this.options.zoom) {
             const label = document.createElement('span');
@@ -174,15 +184,110 @@ class ChronosGrid {
         return `hsl(${Math.abs(hash % 360)}, 60%, 45%)`;
     }
 
+    hexToHsl(hex) {
+        hex = hex.replace(/^#/, '');
+        let r, g, b;
+        if (hex.length === 3) {
+            r = parseInt(hex[0] + hex[0], 16);
+            g = parseInt(hex[1] + hex[1], 16);
+            b = parseInt(hex[2] + hex[2], 16);
+        } else if (hex.length === 6) {
+            r = parseInt(hex.substring(0, 2), 16);
+            g = parseInt(hex.substring(2, 4), 16);
+            b = parseInt(hex.substring(4, 6), 16);
+        } else {
+            return null;
+        }
+
+        r /= 255;
+        g /= 255;
+        b /= 255;
+
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+
+        if (max === min) {
+            h = s = 0;
+        } else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+
+        h = Math.round(h * 360);
+        s = Math.round(s * 100);
+        l = Math.round(l * 100);
+
+        return `hsl(${h}, ${s}%, ${l}%)`;
+    }
+
+    validateEvents() {
+        const validEvents = [];
+        const invalidEvents = [];
+
+        this.data.forEach((entry) => {
+            // 1. Basic properties check
+            if (!entry.start || !entry.end || !entry.title || !entry.day) {
+                invalidEvents.push({ 
+                    event: entry, 
+                    error: "Missing required scheduling fields (start, end, title, or day)" 
+                });
+                return;
+            }
+
+            // 2. Format validation check
+            const timeFormatRegex = /^\d{1,2}:\d{2}$/;
+            if (!timeFormatRegex.test(entry.start) || !timeFormatRegex.test(entry.end)) {
+                invalidEvents.push({
+                    event: entry,
+                    error: `Invalid time format. Start (${entry.start}) and End (${entry.end}) must match HH:MM format.`
+                });
+                return;
+            }
+
+            const startMins = this.timeToMinutes(entry.start);
+            const endMins = this.timeToMinutes(entry.end);
+
+            // 3. Chronological check
+            if (startMins >= endMins) {
+                invalidEvents.push({
+                    event: entry,
+                    error: `Chronological mismatch: start time (${entry.start}) cannot be equal to or greater than end time (${entry.end}).`
+                });
+                return;
+            }
+
+            validEvents.push(entry);
+        });
+
+        if (invalidEvents.length > 0) {
+            invalidEvents.forEach(err => {
+                console.error(`ChronosGrid Validation Error: ${err.error}`, err.event);
+                if (typeof this.options.onValidationError === 'function') {
+                    this.options.onValidationError(err.error, err.event);
+                }
+            });
+        }
+
+        return validEvents;
+    }
+
     renderGrid(interval) {
         this.currentInterval = interval;
         const totalMinutes = (this.options.endTime - this.options.startTime) * 60;
         const totalSlots = totalMinutes / interval;
         
+        const validEvents = this.validateEvents();
+        
         this.grid.innerHTML = '';
         
-        const minColWidth = interval < 30 ? '100px' : '150px';
-        const gridCols = `140px repeat(${totalSlots}, minmax(${minColWidth}, 1fr))`;
+        const gridCols = `var(--cg-day-label-width) repeat(${totalMinutes}, minmax(calc(var(--cg-slot-min-width) / ${interval}), 1fr))`;
         
         // Render Header Row
         const headerRow = document.createElement('div');
@@ -211,15 +316,17 @@ class ChronosGrid {
             th.className = 'time-header';
             th.textContent = timeStr;
             th.setAttribute('role', 'columnheader');
+            th.style.gridColumn = `span ${interval}`;
             headerRow.appendChild(th);
         }
         this.grid.appendChild(headerRow);
 
         // Render Day Rows
         this.options.days.forEach(day => {
-            const dayEvents = this.data.filter(e => e.day === day);
+            const dayEvents = validEvents.filter(e => e.day === day);
             const tracks = this.assignEventsToTracks(dayEvents);
             const totalTracks = tracks.length;
+            const hasOverlap = totalTracks > 1;
 
             const dayRow = document.createElement('div');
             dayRow.className = 'schedule-day-row';
@@ -230,41 +337,71 @@ class ChronosGrid {
 
             const dayLabel = document.createElement('div');
             dayLabel.className = 'day-label';
-            dayLabel.textContent = day;
             dayLabel.setAttribute('role', 'rowheader');
             dayLabel.style.gridRow = `span ${totalTracks}`;
+            
+            const fullSpan = document.createElement('span');
+            fullSpan.className = 'day-full';
+            fullSpan.textContent = day;
+            dayLabel.appendChild(fullSpan);
+
+            const shortSpan = document.createElement('span');
+            shortSpan.className = 'day-short';
+            shortSpan.textContent = day.substring(0, 3);
+            dayLabel.appendChild(shortSpan);
+
             dayRow.appendChild(dayLabel);
 
             // Render each track layout row
             tracks.forEach((trackEvents, trackIdx) => {
-                let rowTracker = new Array(totalSlots).fill(null);
+                let rowTracker = new Array(totalMinutes).fill(null);
 
-                // Map trackEvents into tracker
+                // Map trackEvents into tracker based on minute units relative to grid start
                 trackEvents.forEach(entry => {
-                    const timeToIndex = (t) => {
+                    const timeToMinutesRelative = (t) => {
                         const [hrs, mins] = t.split(':').map(Number);
-                        return Math.floor(((hrs - this.options.startTime) * 60 + mins) / interval);
+                        return (hrs - this.options.startTime) * 60 + mins;
                     };
-                    const startIdx = timeToIndex(entry.start);
-                    const endIdx = timeToIndex(entry.end);
+                    const startMin = timeToMinutesRelative(entry.start);
+                    const endMin = timeToMinutesRelative(entry.end);
+                    const spanMinutes = endMin - startMin;
+
+                    let baseColor = entry.color || this.stringToColor(entry.title);
+                    if (typeof baseColor === 'string') {
+                        let hex = baseColor.trim();
+                        if (hex.startsWith('#')) {
+                            const converted = this.hexToHsl(hex);
+                            if (converted) baseColor = converted;
+                        } else if (/^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$/.test(hex)) {
+                            const converted = this.hexToHsl('#' + hex);
+                            if (converted) baseColor = converted;
+                        }
+                    }
                     
-                    if (startIdx >= 0 && startIdx < totalSlots) {
-                        rowTracker[startIdx] = {
+                    if (startMin >= 0 && startMin < totalMinutes) {
+                        rowTracker[startMin] = {
                             title: entry.title,
                             subtitle: entry.subtitle || '',
-                            span: endIdx - startIdx,
-                            color: this.stringToColor(entry.title),
-                            originalData: entry
+                            span: spanMinutes,
+                            color: baseColor,
+                            originalData: entry,
+                            overlap: hasOverlap
                         };
-                        for (let j = startIdx + 1; j < endIdx; j++) {
-                            if (j < totalSlots) rowTracker[j] = "OCCUPIED";
+                        for (let j = startMin + 1; j < endMin; j++) {
+                            if (j < totalMinutes) rowTracker[j] = "OCCUPIED";
                         }
                     }
                 });
 
                 // Append slot cells to row
-                rowTracker.forEach((slot, slotIdx) => {
-                    if (slot === "OCCUPIED") return;
+                let minuteIdx = 0;
+                while (minuteIdx < totalMinutes) {
+                    const slot = rowTracker[minuteIdx];
+                    
+                    if (slot === "OCCUPIED") {
+                        minuteIdx++;
+                        continue;
+                    }
                     
                     if (slot && typeof slot === 'object') {
                         const baseColor = slot.color;
@@ -274,6 +411,10 @@ class ChronosGrid {
 
                         const bookedSlot = document.createElement('div');
                         bookedSlot.className = 'slot booked';
+                        if (this.options.clashes && slot.overlap) {
+                            bookedSlot.classList.add('overlap-conflict');
+                            bookedSlot.setAttribute('data-overlap', 'true');
+                        }
                         bookedSlot.setAttribute('role', 'gridcell');
                         bookedSlot.setAttribute('tabindex', '0');
                         
@@ -331,13 +472,60 @@ class ChronosGrid {
                         });
 
                         dayRow.appendChild(bookedSlot);
+                        minuteIdx += slot.span;
                     } else {
+                        // Scan vacancy span, splitting at standard interval boundaries where possible
+                        let nextBoundary = Math.floor(minuteIdx / interval) * interval + interval;
+                        if (nextBoundary === minuteIdx) {
+                            nextBoundary += interval;
+                        }
+                        
+                        let limitMin = Math.min(nextBoundary, totalMinutes);
+                        for (let j = minuteIdx + 1; j < limitMin; j++) {
+                            if (rowTracker[j] !== null) {
+                                limitMin = j;
+                                break;
+                            }
+                        }
+                        
+                        const vacancySpan = limitMin - minuteIdx;
+
                         const emptySlot = document.createElement('div');
                         emptySlot.className = 'slot empty';
-                        emptySlot.setAttribute('role', 'gridcell');
+                        emptySlot.setAttribute('role', 'button');
+                        emptySlot.setAttribute('tabindex', '0');
+
+                        // Calculate slot time for callback and aria-label
+                        const totalMinsFromGridStart = minuteIdx;
+                        const h = Math.floor(totalMinsFromGridStart / 60) + this.options.startTime;
+                        const m = totalMinsFromGridStart % 60;
+
+                        const displayHour = h % 12 || 12;
+                        const displayMin = m === 0 ? '00' : (m < 10 ? '0' + m : m);
+                        const ampm = h >= 12 ? 'PM' : 'AM';
+                        const formattedTime = `${displayHour}:${displayMin} ${ampm}`;
+                        emptySlot.setAttribute('aria-label', `Empty slot at ${day} ${formattedTime}`);
+                        emptySlot.style.gridColumn = `span ${vacancySpan}`;
+
+                        const timeString = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
+                        emptySlot.addEventListener('click', (e) => {
+                            if (typeof this.options.onSlotClick === 'function') {
+                                this.options.onSlotClick(day, timeString, emptySlot);
+                            }
+                        });
+
+                        emptySlot.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                emptySlot.click();
+                            }
+                        });
+
                         dayRow.appendChild(emptySlot);
+                        minuteIdx += vacancySpan;
                     }
-                });
+                }
             });
 
             this.grid.appendChild(dayRow);
@@ -358,6 +546,24 @@ class ChronosGrid {
     setData(newData) {
         this.data = newData || [];
         this.renderGrid(this.currentInterval);
+    }
+
+    toggleControls(visible) {
+        if (!this.toolbar) return;
+        this.options.showControls = !!visible;
+        this.toolbar.style.display = visible ? '' : 'none';
+    }
+
+    setHourRange(startTime, endTime) {
+        this.options.startTime = Number(startTime);
+        this.options.endTime = Number(endTime);
+        this.renderGrid(this.currentInterval);
+    }
+
+    setTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        this.options.theme = theme;
+        this.applyTheme(theme, false);
     }
 }
 
